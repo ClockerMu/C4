@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C4 Legal Partners | Excelência Paralegal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-dark: #0b141e; /* Azul Escuro profundo do portfólio */
+            --accent-gold: #c5a059;  /* Dourado institucional para detalhes */
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --bg-card: #131f2d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .brand-title {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        /* Animações de Scroll (Fade-in e Slide) */
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .fade-in-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header / Navegação */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(11, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            z-index: 1000;
+            padding: 1.5rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-c4 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            border-right: 2px solid var(--accent-gold);
+            padding-right: 15px;
+        }
+
+        .logo-text {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 2px;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-gold);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+            position: relative;
+        }
+
+        .hero-subtitle {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        /* Seções Gerais */
+        section {
+            padding: 8rem 10% 6rem 10%;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 60px;
+            height: 2px;
+            background-color: var(--accent-gold);
+        }
+
+        /* Grid de Diferenciais / Sobre */
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .about-image img, .service-image img {
+            width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(197, 160, 89, 0.1);
+        }
+
+        /* Estrutura de Serviços */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background-color: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(197, 160, 89, 0.05);
+            transition: transform 0.4s ease, border 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(197, 160, 89, 0.4);
+        }
+
+        .service-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .service-card ul {
+            list-style: none;
+        }
+
+        .service-card ul li {
+            margin-bottom: 0.8rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .service-card ul li::before {
+            content: '▪';
+            position: absolute;
+            left: 0;
+            color: var(--accent-gold);
+        }
+
+        /* Seção de Destaque para Missão */
+        .mission-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--accent-gold);
+            padding: 4rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 4rem auto;
+            border-radius: 4px;
+        }
+
+        .mission-box p {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            font-style: italic;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Contato / CTA */
+        .contact-section {
+            text-align: center;
+            background-color: #060d14;
+            padding: 6rem 10%;
+        }
+
+        .btn-whatsapp {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--accent-gold);
+            border: 2px solid var(--accent-gold);
+            padding: 1rem 3rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            margin-top: 2rem;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
+        }
+
+        .qr-code-placeholder {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qr-code-placeholder img {
+            width: 150px;
+            height: 150px;
+            border: 2px solid var(--accent-gold);
+            padding: 5px;
+            background: white;
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 768px) {
+            header { padding: 1rem 5%; }
+            nav { display: none; } /* Ideal implementar menu mobile clássico */
+            .about-container { grid-template-columns: 1fr; gap: 2rem; }
+            .hero h1 { font-size: 2.2rem; }
+            section { padding: 6rem 5% 4rem 5%; }
+            .mission-box { padding: 2rem; }
+            .mission-box p { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-c4">C4</div> <div class="logo-text">LEGAL<br>PARTNERS</div> </div>
+        <nav>
+            <a href="#diferencial">Diferencial</a>
+            <a href="#servicos">Serviços</a>
+            <a href="#missao">Missão</a>
+            <a href="#contato">Contato</a>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <p class="hero-subtitle">Excelência na prestação de serviços</p> <h1>Portfólio de Serviços</h1> </main>
+
+    <section id="diferencial" class="fade-in-element">
+        <h2 class="section-title">Nosso Diferencial</h2> <div class="about-container">
+            <div class="about-text">
+                <h3>Excelência técnica e atendimento consultivo</h3> <p>Estes são os pilares fundamentais que regem a C4 Legal Partners. Buscamos compreender e atender minuciosamente as necessidades de cada cliente, garantindo acompanhamento estritamente personalizado.</p> <p>Oferecemos disponibilidade em tempo integral para alcançar com máxima precisão os interesses estratégicos de nossos parceiros empresariais.</p> </div>
+            <div class="about-image">
+                <img src="escritorio.jpg" alt="C4 Legal Partners Office">
+            </div>
+        </div>
+    </section>
+
+    <section id="servicos" style="background-color: #091018;">
+        <h2 class="section-title fade-in-element">Serviços Especializados</h2>
+        
+        <div class="services-grid">
+            
+            <div class="service-card fade-in-element">
+                <h3>Registro Mercantil</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Atos Societários</p> <ul>
+                    <li>Registro de atos societários em todas as Juntas Comerciais do país</li>
+                    <li>Constituição e alterações contratuais</li>
+                    <li>Reuniões ou assembleias gerais</li>
+                    <li>Distrato social</li>
+                    <li>Atos de transformação, cisão e incorporações</li>
+                    <li>Abertura, alteração e encerramento de filiais</li>
+                    <li>Arquivamento especializado de procurações, jornais e documentos de interesse</li>
+                </ul>
+            </div>
+
+            <div class="service-card fade-in-element">
+                <h3>Registro Mercantil</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Recursos & Certidões</p> <ul>
+                    <li>Pedidos revisionais e Recursos administrativos</li>
+                    <li>Emissão estratégica de certidões simplificadas, específicas e de inteiro teor</li>
+                    <li>Intermediação e atendimento direto com vogais e assessores de registro da Junta Comercial</li>
+                    <li>Comunicação de processos judiciais e arquivamento de certidão premonitória</li>
+                    <li>Regularização estrutural de ficha cadastral e saneamento de boletim administrativo-BA</li>
+                </ul>
+            </div>
+
+            <div class="service-card fade-in-element">
+                <h3>Registros Complementares</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Suporte Contínuo</p> <ul>
+                    <li>Obtenção de CNPJ corporativo pelo Módulo de Administração Tributária (MAT)</li>
+                    <li>Indicação formal de Beneficiário Final (UBO) no sistema e-BEF</li>
+                    <li>Regularização de Inscrição Municipal e Inscrição Estadual</li>
+                    <li>Inscrição dedicada no FGTS para fins específicos de emissão do CRF</li>
+                </ul>
+            </div>
+
+            <div class="service-card fade-in-element">
+                <h3>Cartório de Registro de PJ</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Sociedade Simples</p> <ul>
+                    <li>Atuação altamente técnica no registro completo de sociedades simples (Profissionais)</li>
+                    <li>Constituição, Alterações Contratuais e Distrato Social</li>
+                    <li>Atas de Reuniões e Assembleias Gerais</li>
+                    <li>Processos de Transformação de Natureza Jurídica</li>
+                    <li>Emissão célere de Certidões institucionais</li>
+                </ul>
+            </div>
+
+            <div class="service-card fade-in-element" style="grid-column: span 1;">
+                <h3>Facilities Jurídico</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Documentação & Certificados</p> <ul>
+                    <li>Regularização, traduções juramentadas e registro integral em Cartório de Registros de Títulos e Documentos (RTD)</li>
+                    <li>Emissão e renovação guiada de certificado digital corporativo</li>
+                    <li>Gestão inteligente de assinaturas eletrônicas via portal Certisign, assegurando plena validade jurídica</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="missao" class="fade-in-element">
+        <div class="mission-box">
+            <p>"Nossa missão é garantir a segurança jurídica e a eficiência operacional por meio de uma assessoria paralegal de alta performance."</p> </div>
+    </section>
+
+    <section id="contato" class="contact-section fade-in-element">
+        <h2 class="brand-title" style="font-size: 2.5rem; margin-bottom: 1rem;">Vamos conversar?</h2> <p style="color: var(--text-muted);">Entre em contato direto com os nossos especialistas parceiros.</p>
+        
+        <a href="https://wa.me/qr/CLIUBF6MH5F4C1" target="_blank" class="btn-whatsapp">Iniciar Atendimento</a>
+
+        <div class="qr-code-placeholder">
+            <img src="qrcode.png" alt="WhatsApp QR Code">
+            <span style="font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;">Aponte a câmera para o QR Code</span>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const elementsToAnimate = document.querySelectorAll('.fade-in-element');
+
+            const observerOptions = {
+                root: null, // viewport do navegador
+                threshold: 0.15, // ativa quando 15% do componente está visível
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Opcional: deixar de observar após animar uma vez
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            elementsToAnimate.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>
