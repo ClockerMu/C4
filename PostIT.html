@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas</title>
+    <style>
+        /* --- Estilo Clean e Moderno (CSS) --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* Variáveis de Cores (Modo Claro) */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --element-bg: #ffffff;
+            --note-text: #444;
+            --border-color: #eee;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --date-color: #999;
+            --btn-hover-opacity: 0.9;
+            --toolbar-bg: #f8f9fa;
+            --title-color: #2c3e50;
+        }
+
+        /* Variáveis de Cores (Modo Escuro) */
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #f4f7f6;
+            --element-bg: #1e1e1e;
+            --note-text: #cccccc;
+            --border-color: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+            --date-color: #777;
+            --toolbar-bg: #2a2a2a;
+            --title-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto 40px auto;
+            background-color: var(--element-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s ease;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-controls { display: flex; align-items: center; gap: 15px; }
+        h1 { margin: 0; font-size: 20px; font-weight: 600; }
+
+        button {
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        button:hover { opacity: var(--btn-hover-opacity); }
+
+        #theme-btn {
+            background-color: transparent;
+            color: var(--text-color);
+            font-size: 20px;
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        #theme-btn:hover { background-color: var(--border-color); }
+
+        #add-btn { background-color: #007bff; color: white; }
+        #clear-btn { background-color: #dc3545; color: white; }
+
+        #color-picker {
+            height: 35px; width: 35px; border: none; border-radius: 50%;
+            cursor: pointer; background: none; padding: 0; overflow: hidden;
+        }
+        #color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        #color-picker::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+        /* Barra de Formatação */
+        .toolbar {
+            display: flex; gap: 10px; padding: 10px 30px;
+            background-color: var(--toolbar-bg); align-items: center;
+        }
+
+        .format-btn {
+            background-color: transparent; color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 6px 12px;
+            font-size: 15px; border-radius: 6px;
+        }
+        
+        .format-btn:hover { background-color: var(--border-color); }
+        .btn-bold { font-weight: bold; }
+        .btn-italic { font-style: italic; font-family: serif; }
+        .btn-underline { text-decoration: underline; }
+        .btn-strike { text-decoration: line-through; }
+
+        #board {
+            max-width: 1000px; margin: 0 auto; display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px;
+        }
+
+        /* A Nota Minimalista */
+        .post-it {
+            background-color: var(--element-bg); border-radius: 12px;
+            height: 240px; padding: 20px 20px 15px 20px;
+            box-shadow: var(--shadow); display: flex; flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            position: relative; border-top: 6px solid #f1c40f; 
+        }
+
+        .post-it:hover {
+            transform: translateY(-5px); box-shadow: var(--shadow-hover);
+        }
+
+        .delete-btn {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            color: var(--date-color); font-size: 16px; cursor: pointer; padding: 0; line-height: 1;
+        }
+        .delete-btn:hover { color: #ff4757; background: none; opacity: 1; }
+
+        /* Campo de Título da Nota */
+        .note-title {
+            font-size: 16px; font-weight: 700; color: var(--title-color);
+            background: transparent; border: none; border-bottom: 1px solid transparent;
+            width: 85%; /* Deixa espaço para o botão de fechar */
+            padding-bottom: 5px; margin-bottom: 5px; outline: none;
+            font-family: inherit; transition: border-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .note-title:focus { border-bottom: 1px dashed var(--border-color); }
+        .note-title::placeholder { color: var(--date-color); font-weight: 500; }
+
+        /* Área de texto editável */
+        .note-text {
+            flex-grow: 1; margin-top: 5px; outline: none; overflow-y: auto;
+            word-wrap: break-word; font-size: 14px; line-height: 1.5;
+            color: var(--note-text); transition: color 0.3s ease;
+        }
+
+        .note-text::-webkit-scrollbar { width: 4px; }
+        .note-text::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
+
+        .note-date {
+            font-size: 11px; color: var(--date-color); text-align: left;
+            margin-top: 10px; border-top: 1px solid var(--border-color);
+            padding-top: 8px; transition: color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="header">
+            <h1>Minhas Notas</h1>
+            <div class="header-controls">
+                <button id="theme-btn" title="Alternar Modo Escuro">🌙</button>
+                <input type="color" id="color-picker" value="#007bff" title="Cor da borda">
+                <button id="add-btn">+ Nova Nota</button>
+                <button id="clear-btn">Limpar Tudo</button>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <span style="font-size: 13px; color: var(--date-color); margin-right: 10px;">Formatar Texto:</span>
+            <button class="format-btn btn-bold" onclick="formatText('bold')" title="Negrito">B</button>
+            <button class="format-btn btn-italic" onclick="formatText('italic')" title="Itálico">I</button>
+            <button class="format-btn btn-underline" onclick="formatText('underline')" title="Sublinhado">U</button>
+            <button class="format-btn btn-strike" onclick="formatText('strikeThrough')" title="Tachado">S</button>
+            <button class="format-btn" onclick="formatText('insertUnorderedList')" title="Lista">● Lista</button>
+            <button class="format-btn" onclick="formatText('removeFormat')" title="Remover Formatação">🧹 Limpar</button>
+        </div>
+    </div>
+
+    <div id="board">
+        </div>
+
+    <script>
+        // --- Função de Formatação ---
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            saveNotes(); 
+        }
+
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('mousedown', (e) => { e.preventDefault(); });
+        });
+
+        // --- Lógica Principal ---
+        const board = document.getElementById('board');
+        const addBtn = document.getElementById('add-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const colorPicker = document.getElementById('color-picker');
+        const themeBtn = document.getElementById('theme-btn');
+
+        // Dark Mode
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeBtn.innerText = '☀️';
+        }
+
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            themeBtn.innerText = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // --- Sistema de Notas (Agora com Títulos) ---
+        // Mudei o nome do banco local para 'postits_v3' para não quebrar com as notas sem título
+        let savedNotes = JSON.parse(localStorage.getItem('postits_v3')) || [];
+
+        function saveNotes() {
+            const notesArray = [];
+            document.querySelectorAll('.post-it').forEach(noteDiv => {
+                notesArray.push({
+                    title: noteDiv.querySelector('.note-title').value,
+                    content: noteDiv.querySelector('.note-text').innerHTML,
+                    color: noteDiv.dataset.color,
+                    date: noteDiv.querySelector('.note-date').innerText
+                });
+            });
+            localStorage.setItem('postits_v3', JSON.stringify(notesArray));
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return now.toLocaleDateString('pt-BR', options);
+        }
+
+        function createNote(noteData = {}) {
+            const title = noteData.title || '';
+            const content = noteData.content || '';
+            const borderColor = noteData.color || colorPicker.value;
+            const dateStr = noteData.date || getCurrentDate();
+            
+            const noteDiv = document.createElement('div');
+            noteDiv.classList.add('post-it');
+            noteDiv.style.borderTopColor = borderColor;
+            noteDiv.dataset.color = borderColor; 
+
+            // Botão Apagar
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.innerHTML = '✕';
+            deleteBtn.addEventListener('click', () => {
+                noteDiv.style.opacity = '0';
+                setTimeout(() => { noteDiv.remove(); saveNotes(); }, 200);
+            });
+
+            // Campo de Título
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.classList.add('note-title');
+            titleInput.placeholder = 'Título da nota...';
+            titleInput.value = title;
+            titleInput.addEventListener('input', saveNotes); // Salva ao digitar o título
+
+            // Área de Texto
+            const textArea = document.createElement('div');
+            textArea.classList.add('note-text');
+            textArea.contentEditable = "true";
+            textArea.innerHTML = content;
+            textArea.addEventListener('input', saveNotes);
+            textArea.addEventListener('keyup', saveNotes);
+
+            // Data
+            const dateArea = document.createElement('div');
+            dateArea.classList.add('note-date');
+            dateArea.innerText = dateStr;
+
+            // Montando o Post-it
+            noteDiv.appendChild(deleteBtn);
+            noteDiv.appendChild(titleInput); // Adiciona o título primeiro
+            noteDiv.appendChild(textArea);   // Depois o corpo do texto
+            noteDiv.appendChild(dateArea);
+            
+            board.insertBefore(noteDiv, board.firstChild);
+        }
+
+        addBtn.addEventListener('click', () => {
+            createNote();
+            saveNotes();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if(confirm("Tem certeza que deseja apagar TODAS as notas?")) {
+                board.innerHTML = '';
+                saveNotes();
+            }
+        });
+
+        // Carregar notas iniciais
+        if (savedNotes.length > 0) {
+            savedNotes.reverse().forEach(note => createNote(note));
+        } else {
+            createNote({
+                title: 'Post-it com Título!',
+                content: 'Agora você pode nomear suas notas.<br><br>Basta clicar na linha de cima e digitar.',
+                color: '#e67e22'
+            });
+            createNote({
+                title: 'Reunião de Projeto',
+                content: '<ul><li>Definir cronograma</li><li>Revisar código</li></ul>',
+                color: '#3498db'
+            });
+        }
+    </script>
+</body>
+</html>
