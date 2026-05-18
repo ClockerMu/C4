@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super ToDo List</title>
+  <style>
+    /* Sistema de Variáveis para Suporte de Temas */
+    :root {
+      --bg-gradient: linear-gradient(145deg, #f0f3f8 0%, #e6ecf4 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.5);
+      --text-title: #1b2b40;
+      --text-main: #1f3b4f;
+      --text-muted: #62778b;
+      --input-bg: #ffffff;
+      --input-border: #dbe2ea;
+      --item-bg: #ffffff;
+      --item-border: #eef3f9;
+      --btn-bg: #2b4d6a;
+      --btn-hover: #1f405b;
+      --shadow-card: 0 25px 45px -12px rgba(0,10,30,0.25), 0 8px 18px rgba(0,0,0,0.05);
+      
+      /* Cores de Prioridade */
+      --prio-low: #10b981;
+      --prio-medium: #f59e0b;
+      --prio-high: #ef4444;
+    }
+
+    body.dark-mode {
+      --bg-gradient: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-title: #f8fafc;
+      --text-main: #cbd5e1;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --input-border: #334155;
+      --item-bg: #1e293b;
+      --item-border: #334155;
+      --btn-bg: #3b82f6;
+      --btn-hover: #2563eb;
+      --shadow-card: 0 25px 45px -12px rgba(0,0,0,0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .todo-card {
+      max-width: 650px;
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 2.5rem;
+      box-shadow: var(--shadow-card);
+      padding: 2.2rem 2rem;
+      border: 1px solid var(--card-border);
+    }
+
+    /* Topo do App */
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-title);
+      border-left: 8px solid var(--btn-bg);
+      padding-left: 1.2rem;
+    }
+
+    /* Botões Utilitários Superiores */
+    .top-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .icon-btn:hover {
+      background: var(--btn-bg);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .sub {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      padding-left: 1.8rem;
+      font-style: italic;
+      border-bottom: 1px dashed var(--input-border);
+      padding-bottom: 0.75rem;
+    }
+
+    /* Área Avançada de Inputs */
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-row-main {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-row-main input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      color: var(--text-main);
+      padding: 0.9rem 1.4rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      outline: none;
+    }
+    .input-row-main input:focus {
+      border-color: var(--btn-bg);
+    }
+
+    .input-row-sub {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .input-row-sub select {
+      flex: 1;
+      min-width: 130px;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      color: var(--text-main);
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      background: var(--btn-bg);
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0 1.8rem;
+      border-radius: 60px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .add-btn:hover {
+      background: var(--btn-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Filtros Rápidos */
+    .filters-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.2rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .filter-tab {
+      background: transparent;
+      border: 1px solid var(--input-border);
+      color: var(--text-muted);
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-tab.active {
+      background: var(--btn-bg);
+      color: white;
+      border-color: var(--btn-bg);
+    }
+
+    /* Estatísticas e Controle Geral */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+      background: var(--input-bg);
+      padding: 0.6rem 1.3rem;
+      border-radius: 60px;
+      color: var(--text-main);
+      border: 1px solid var(--input-border);
+    }
+    .counter {
+      font-weight: 600;
+    }
+    .clear-btn {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .clear-btn:hover { text-decoration: underline; }
+
+    /* Itens da Lista Dinâmica */
+    .todo-list-container {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 2rem;
+      padding: 0.4rem;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    body.dark-mode .todo-list-container { background: rgba(255, 255, 255, 0.02); }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--item-bg);
+      margin: 0.6rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid var(--item-border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.01);
+    }
+
+    .todo-check {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2.5px solid var(--input-border);
+      background: var(--input-bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .todo-check:checked {
+      background: #10b981;
+      border-color: #059669;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .todo-text {
+      flex: 1;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+    .todo-check:checked + .todo-text {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    /* Badges de Categoria e Prioridade */
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      color: white;
+      white-space: nowrap;
+    }
+    .badge.cat { background: #64748b; color: #f8fafc; }
+    .badge.prio-baixa { background: var(--prio-low); }
+    .badge.prio-média { background: var(--prio-medium); }
+    .badge.prio-alta { background: var(--prio-high); }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+    }
+    .delete-btn:hover {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 2.2rem 1rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="todo-card">
+  <div class="header-wrapper">
+    <h1>Minhas Tarefas</h1>
+    <div class="top-actions">
+      <input type="file" id="importTxt" accept=".txt" style="display:none">
+      
+      <button class="icon-btn" id="importBtn" title="Importar Backup (.txt)">💾</button>
+      <button class="icon-btn" id="exportBtn" title="Exportar Backup (.txt)">📤</button>
+      <button class="icon-btn" id="themeToggleBtn" title="Mudar Tema">🌙</button>
+    </div>
+  </div>
+  <div class="sub">Organização nativa inteligente · Livre de cookies</div>
+
+  <div class="input-container">
+    <div class="input-row-main">
+      <input type="text" id="taskInput" placeholder="Escreva uma nova tarefa..." autofocus>
+    </div>
+    <div class="input-row-sub">
+      <select id="categorySelect">
+        <option value="💼 Trabalho">💼 Trabalho</option>
+        <option value="👤 Pessoal">👤 Pessoal</option>
+        <option value="🛒 Compras">🛒 Compras</option>
+        <option value="💡 Ideias">💡 Ideias</option>
+      </select>
+      <select id="prioritySelect">
+        <option value="Baixa">🟢 Prioridade: Baixa</option>
+        <option value="Média" selected>🟡 Prioridade: Média</option>
+        <option value="Alta">🔴 Prioridade: Alta</option>
+      </select>
+      <button class="add-btn" id="addTaskBtn"><b>+</b> ADICIONAR</button>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <button class="filter-tab active" data-filter="all">Todas</button>
+    <button class="filter-tab" data-filter="pending">Pendentes</button>
+    <button class="filter-tab" data-filter="completed">Concluídas</button>
+    <button class="filter-tab" data-filter="💼 Trabalho">Trabalho</button>
+    <button class="filter-tab" data-filter="👤 Pessoal">Pessoal</button>
+  </div>
+
+  <div class="stats">
+    <span class="counter" id="taskCounter">0 tarefas</span>
+    <button class="clear-btn" id="clearAllBtn">Limpar Tudo</button>
+  </div>
+
+  <div class="todo-list-container" id="todoListContainer"></div>
+</div>
+
+<script>
+  (function() {
+    // Estado consolidado (Dados iniciais padrão)
+    let state = {
+      theme: 'light',
+      tasks: [
+        { id: '1', text: 'Configurar painel de indexadores', category: '💼 Trabalho', priority: 'Alta', completed: false },
+        { id: '2', text: 'Comprar pilhas novas', category: '🛒 Compras', priority: 'Baixa', completed: true }
+      ]
+    };
+
+    let currentFilter = 'all';
+
+    // Elementos DOM
+    const taskInput = document.getElementById('taskInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const prioritySelect = document.getElementById('prioritySelect');
+    const addBtn = document.getElementById('addTaskBtn');
+    const todoContainer = document.getElementById('todoListContainer');
+    const taskCounter = document.getElementById('taskCounter');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const importTxt = document.getElementById('importTxt');
+
+    // Cache local apenas por conveniência ao recarregar a página
+    function loadCache() {
+      try {
+        const stored = localStorage.getItem('optimized_todo_data');
+        if (stored) state = JSON.parse(stored);
+      } catch (e) {}
+    }
+
+    function saveCache() {
+      try {
+        localStorage.setItem('optimized_todo_data', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    // Aplicação de visual de Temas (Dark/Light)
+    function applyTheme() {
+      if (state.theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggleBtn.textContent = '☀️';
+      } else {
+        document.body.classList.remove('dark-mode');
+        themeToggleBtn.textContent = '🌙';
+      }
+    }
+
+    // Processamento de Renderização Dinâmica
+    function render() {
+      // Filtragem
+      let filteredTasks = state.tasks;
+      if (currentFilter === 'pending') {
+        filteredTasks = state.tasks.filter(t => !t.completed);
+      } else if (currentFilter === 'completed') {
+        filteredTasks = state.tasks.filter(t => t.completed);
+      } else if (currentFilter !== 'all') {
+        filteredTasks = state.tasks.filter(t => t.category === currentFilter);
+      }
+
+      // Ordenação: Pendentes primeiro, e depois por prioridade (Alta > Média > Baixa)
+      const pMap = { 'Alta': 3, 'Média': 2, 'Baixa': 1 };
+      filteredTasks.sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed - b.completed;
+        return pMap[b.priority] - pMap[a.priority];
+      });
+
+      if (filteredTasks.length === 0) {
+        todoContainer.innerHTML = `<div class="empty-message">Nenhuma tarefa encontrada nesta aba! ✨</div>`;
+      } else {
+        let html = '';
+        filteredTasks.forEach(task => {
+          const checked = task.completed ? 'checked' : '';
+          html += `
+            <div class="todo-item" data-id="${task.id}">
+              <input type="checkbox" class="todo-check" ${checked} data-id="${task.id}">
+              <span class="todo-text">${escapeHtml(task.text)}</span>
+              <span class="badge cat">${task.category}</span>
+              <span class="badge prio-${task.priority.toLowerCase()}">${task.priority}</span>
+              <button class="delete-btn" data-id="${task.id}">✕</button>
+            </div>
+          `;
+        });
+        todoContainer.innerHTML = html;
+      }
+
+      // Atualiza painel numérico
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.completed).length;
+      taskCounter.textContent = `${total} cadastradas (${done} concluídas)`;
+      
+      saveCache();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Ações das tarefas
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+
+      state.tasks.push({
+        id: Date.now().toString(),
+        text: text,
+        category: categorySelect.value,
+        priority: prioritySelect.value,
+        completed: false
+      });
+
+      taskInput.value = '';
+      render();
+    }
+
+    // --- IMPORTAR & EXPORTAR BACKUP VIA ARQUIVO .TXT ---
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'todo-list-backup.txt';
+      a.click();
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => importTxt.click());
+    
+    importTxt.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (imported.tasks) {
+            state = imported;
+            applyTheme();
+            render();
+            alert('Backup importado com sucesso!');
+          }
+        } catch (err) {
+          alert('Arquivo de texto inválido.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Gerenciamento de cliques internos da Lista (Delegação de Eventos)
+    todoContainer.addEventListener('click', (e) => {
+      const id = e.target.getAttribute('data-id');
+      if (!id) return;
+
+      if (e.target.classList.contains('delete-btn')) {
+        state.tasks = state.tasks.filter(t => t.id !== id);
+        render();
+      } else if (e.target.classList.contains('todo-check')) {
+        const task = state.tasks.find(t => t.id === id);
+        if (task) {
+          task.completed = e.target.checked;
+          render();
+        }
+      }
+    });
+
+    // Abas de Filtros
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        currentFilter = e.target.getAttribute('data-filter');
+        render();
+      });
+    });
+
+    // Alternador de Temas
+    themeToggleBtn.addEventListener('click', () => {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      applyTheme();
+      saveCache();
+    });
+
+    // Gatilhos Normais
+    addBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+    clearAllBtn.addEventListener('click', () => {
+      if (confirm('Deseja deletar todas as tarefas pendentes e concluídas?')) {
+        state.tasks = [];
+        render();
+      }
+    });
+
+    // Inicialização do Sistema
+    loadCache();
+    applyTheme();
+    render();
+  })();
+</script>
+</body>
+</html>
