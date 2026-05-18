@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Portátil com Backup</title>
+    <title>Dashboard Portátil Autocarregável</title>
     <style>
         /* Variáveis de Estilo para Dark/Light Mode */
         :root {
@@ -79,7 +79,6 @@
             flex-wrap: wrap;
         }
 
-        /* Botões Estilizados */
         .btn {
             color: var(--text-main);
             background: var(--card-bg);
@@ -109,7 +108,6 @@
         }
         .btn-primary:hover { background: var(--accent-hover); }
 
-        /* Grid de Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -165,7 +163,6 @@
             color: var(--text-muted);
         }
 
-        /* Ações Flutuantes nos Cards */
         .card-actions {
             position: absolute;
             top: 12px;
@@ -195,7 +192,6 @@
         .action-btn.edit:hover { background: var(--accent); color: white; }
         .action-btn.delete:hover { background: var(--danger); color: white; }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -240,7 +236,6 @@
         }
         .form-group input:focus { outline: none; border-color: var(--accent); }
 
-        /* Seletor de Emoji */
         .emoji-trigger {
             background: var(--input-bg);
             border: 1px solid var(--card-border);
@@ -280,11 +275,11 @@
             <div class="header-actions">
                 <input type="file" id="importInput" accept=".txt" style="display: none;" onchange="importConfig(event)">
                 
-                <button class="btn" onclick="document.getElementById('importInput').click()" title="Carregar arquivo de configuração">
+                <button class="btn" onclick="document.getElementById('importInput').click()" title="Carregar arquivo manualmente">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                     Importar .txt
                 </button>
-                <button class="btn" onclick="exportConfig()" title="Baixar arquivo de configuração">
+                <button class="btn" onclick="exportConfig()" title="Baixar arquivo de configuração atualizado">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Exportar .txt
                 </button>
@@ -319,7 +314,7 @@
                 </div>
                 <div class="form-group">
                     <label for="pageUrl">Nome do Arquivo .html</label>
-                    <input type="text" id="pageUrl" required placeholder="Ex: projeto.html">
+                    <input type="text" id="pageUrl" required placeholder="Ex: ToDo.html">
                 </div>
 
                 <div class="modal-actions">
@@ -333,12 +328,12 @@
     <script>
         const emojiList = ['🚀','🏠','🧑‍💻','📁','🎨','⚙️','📊','🌐','📝','🛠️','🔥','✨','📦','📱','💻','🔑','💡','🔔','🛒','🎮','🎬'];
         
-        // Objeto global que guarda todo o estado da aplicação
-        let appState = JSON.parse(localStorage.getItem('portable_dashboard_data')) || {
+        // Estado padrão inicial caso o arquivo na raiz falte ou dê erro
+        let appState = {
             theme: 'dark',
             links: [
                 { id: 1, name: 'Página Inicial', url: 'index.html', emoji: '🏠' },
-                { id: 2, name: 'Sobre Mim', url: 'sobre.html', emoji: '🧑‍💻' }
+                { id: 2, name: 'Lista de Tarefas', url: 'ToDo.html', emoji: '📝' }
             ]
         };
 
@@ -348,7 +343,36 @@
         const pageEmojiInput = document.getElementById('pageEmoji');
         const emojiBtn = document.getElementById('emojiBtn');
 
-        // --- EXPORTAR CONFIGURAÇÃO (Gera arquivo .txt) ---
+        // --- CARREGAMENTO AUTOMÁTICO DO DEFAULT NA RAIZ ---
+        async function loadDefaultConfig() {
+            try {
+                // Tenta buscar o arquivo padrão "dashboard-config.txt" na mesma pasta
+                const response = await fetch('dashboard-config.txt');
+                if (response.ok) {
+                    const localData = await response.json();
+                    if (localData && Array.isArray(localData.links)) {
+                        appState = localData;
+                        saveToCache();
+                        console.log("Sucesso: Configuração carregada direto de 'dashboard-config.txt'.");
+                    }
+                } else {
+                    loadFromCache();
+                }
+            } catch (err) {
+                // Se der erro de CORS (arquivo aberto localmente sem servidor) usa o cache local
+                console.warn("Aviso: Não foi possível ler 'dashboard-config.txt' diretamente. Usando cache local.");
+                loadFromCache();
+            }
+            
+            applyTheme();
+            renderLinks();
+        }
+
+        function loadFromCache() {
+            const cached = localStorage.getItem('portable_dashboard_data');
+            if (cached) appState = JSON.parse(cached);
+        }
+
         function exportConfig() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -359,7 +383,6 @@
             downloadAnchor.remove();
         }
 
-        // --- IMPORTAR CONFIGURAÇÃO (Lê arquivo .txt) ---
         function importConfig(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -368,8 +391,6 @@
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    
-                    // Validação simples para ver se o arquivo é compatível
                     if (importedData.links && Array.isArray(importedData.links)) {
                         appState = importedData;
                         saveToCache();
@@ -377,17 +398,16 @@
                         renderLinks();
                         alert('Configurações importadas com sucesso!');
                     } else {
-                        alert('Arquivo inválido ou corrompido.');
+                        alert('Arquivo inválido.');
                     }
                 } catch (err) {
-                    alert('Erro ao ler o arquivo de texto.');
+                    alert('Erro ao ler o arquivo.');
                 }
             };
             reader.readAsText(file);
-            event.target.value = ''; // Reseta o input de arquivo
+            event.target.value = '';
         }
 
-        // --- DARK / LIGHT MODE ---
         function applyTheme() {
             if (appState.theme === 'light') {
                 document.body.classList.add('light-mode');
@@ -412,7 +432,6 @@
             }
         }
 
-        // --- SELETOR DE EMOJI ---
         function initEmojiPicker() {
             emojiPicker.innerHTML = '';
             emojiList.forEach(emoji => {
@@ -427,7 +446,6 @@
         function selectEmoji(emoji) { pageEmojiInput.value = emoji; emojiBtn.innerText = emoji; emojiPicker.classList.remove('open'); }
         document.addEventListener('click', () => emojiPicker.classList.remove('open'));
 
-        // --- RENDERIZAR LINKS ---
         function renderLinks() {
             grid.innerHTML = '';
             appState.links.forEach(link => {
@@ -466,7 +484,6 @@
             }
         }
 
-        // --- CONTROLES DO MODAL ---
         function openModal(isEdit, id = null) {
             modalOverlay.classList.add('active');
             if (isEdit) {
@@ -512,15 +529,13 @@
             closeModal();
         }
 
-        // Armazenamento local rápido apenas para conveniência
         function saveToCache() {
             localStorage.setItem('portable_dashboard_data', JSON.stringify(appState));
         }
 
-        // Inicialização
-        applyTheme();
+        // Inicialização Avançada por função assíncrona
         initEmojiPicker();
-        renderLinks();
+        loadDefaultConfig();
     </script>
 </body>
 </html>
