@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Projetos Automático</title>
+    <title>Dashboard Portátil com Backup</title>
     <style>
+        /* Variáveis de Estilo para Dark/Light Mode */
         :root {
             --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
             --card-bg: rgba(22, 30, 49, 0.7);
@@ -13,9 +14,22 @@
             --text-muted: #9ca3af;
             --accent: #3b82f6;
             --accent-hover: #2563eb;
+            --danger: #ef4444;
             --radius-lg: 16px;
             --radius-md: 10px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --modal-bg: #161e31;
+            --input-bg: #0b0f19;
+        }
+
+        body.light-mode {
+            --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --modal-bg: #ffffff;
+            --input-bg: #f8fafc;
         }
 
         * {
@@ -33,6 +47,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background 0.4s ease, color 0.3s ease;
         }
 
         .container {
@@ -54,43 +69,47 @@
         h1 {
             font-size: 1.8rem;
             font-weight: 700;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.04em;
         }
 
         .header-actions {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.6rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
+        /* Botões Estilizados */
         .btn {
-            color: white;
-            border: none;
-            padding: 0.65rem 1.25rem;
+            color: var(--text-main);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 0.6rem 1.1rem;
             border-radius: var(--radius-md);
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             transition: var(--transition);
         }
 
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn:hover { background: rgba(0,0,0,0.04); }
+
         .btn-primary {
             background: var(--accent);
+            color: white;
+            border: none;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
         }
+        .btn-primary:hover { background: var(--accent-hover); }
 
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-        }
-
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-
-        /* Grid e Cards */
+        /* Grid de Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -101,7 +120,7 @@
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -115,7 +134,7 @@
         .card:hover {
             transform: translateY(-4px);
             border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
         }
 
         .card-emoji {
@@ -128,10 +147,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: var(--transition);
         }
-
-        .card:hover .card-emoji { transform: scale(1.08); }
+        body.light-mode .card-emoji { background: rgba(0, 0, 0, 0.03); }
 
         .card-title {
             font-size: 1.05rem;
@@ -148,11 +165,21 @@
             color: var(--text-muted);
         }
 
-        .btn-edit {
+        /* Ações Flutuantes nos Cards */
+        .card-actions {
             position: absolute;
             top: 12px;
             right: 12px;
-            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover .card-actions { opacity: 1; }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.08);
             border: none;
             width: 28px;
             height: 28px;
@@ -161,19 +188,18 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            opacity: 0;
             transition: var(--transition);
-            color: white;
+            color: var(--text-main);
         }
-
-        .card:hover .btn-edit { opacity: 1; }
-        .btn-edit:hover { background: var(--accent); }
+        body.light-mode .action-btn { background: rgba(0, 0, 0, 0.05); }
+        .action-btn.edit:hover { background: var(--accent); color: white; }
+        .action-btn.delete:hover { background: var(--danger); color: white; }
 
         /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 10, 19, 0.7);
+            background: rgba(7, 10, 19, 0.4);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
@@ -187,7 +213,7 @@
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .modal {
-            background: #161e31;
+            background: var(--modal-bg);
             border: 1px solid var(--card-border);
             padding: 2rem;
             border-radius: var(--radius-lg);
@@ -195,89 +221,55 @@
             max-width: 420px;
             transform: scale(0.95);
             transition: var(--transition);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
         .modal-overlay.active .modal { transform: scale(1); }
-
         .modal h3 { margin-bottom: 1.5rem; font-size: 1.25rem; }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            position: relative;
-        }
-
+        .form-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; position: relative; }
         .form-group label { font-size: 0.85rem; color: var(--text-muted); }
 
         .form-group input {
-            background: #0b0f19;
+            background: var(--input-bg);
             border: 1px solid var(--card-border);
             padding: 0.75rem;
             border-radius: var(--radius-md);
-            color: white;
+            color: var(--text-main);
             font-size: 0.95rem;
+            transition: var(--transition);
         }
-
         .form-group input:focus { outline: none; border-color: var(--accent); }
 
-        /* Seletor de Emoji Customizado e Fluido */
+        /* Seletor de Emoji */
         .emoji-trigger {
-            background: #0b0f19;
+            background: var(--input-bg);
             border: 1px solid var(--card-border);
             padding: 0.75rem;
             border-radius: var(--radius-md);
             font-size: 1.5rem;
             cursor: pointer;
             text-align: left;
-            transition: var(--transition);
         }
-        .emoji-trigger:hover { border-color: rgba(255,255,255,0.2); }
 
         .emoji-picker-box {
-            position: absolute;
-            top: 75px;
-            left: 0;
-            background: #1f2a45;
-            border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 75px; left: 0;
+            background: var(--modal-bg);
+            border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
             padding: 0.7rem;
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.4rem;
-            z-index: 10;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            max-height: 180px;
-            overflow-y: auto;
-            opacity: 0;
-            transform: translateY(-5px);
-            pointer-events: none;
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem;
+            z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            max-height: 180px; overflow-y: auto;
+            opacity: 0; transform: translateY(-5px); pointer-events: none;
             transition: var(--transition);
         }
 
-        .emoji-picker-box.open {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: all;
-        }
-
-        .emoji-option {
-            font-size: 1.3rem;
-            padding: 0.3rem;
-            cursor: pointer;
-            border-radius: 6px;
-            text-align: center;
-            transition: var(--transition);
-        }
+        .emoji-picker-box.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+        .emoji-option { font-size: 1.3rem; padding: 0.3rem; cursor: pointer; border-radius: 6px; text-align: center; transition: var(--transition); }
         .emoji-option:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
+        body.light-mode .emoji-option:hover { background: rgba(0,0,0,0.05); }
 
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            margin-top: 2rem;
-        }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; }
     </style>
 </head>
 <body>
@@ -286,13 +278,21 @@
         <header>
             <h1>Meus Projetos</h1>
             <div class="header-actions">
-                <input type="file" id="folderScanner" webkitdirectory directory multiple style="display: none;">
-                <button class="btn btn-secondary" onclick="document.getElementById('folderScanner').click()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                    Escanear Pasta
+                <input type="file" id="importInput" accept=".txt" style="display: none;" onchange="importConfig(event)">
+                
+                <button class="btn" onclick="document.getElementById('importInput').click()" title="Carregar arquivo de configuração">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    Importar .txt
+                </button>
+                <button class="btn" onclick="exportConfig()" title="Baixar arquivo de configuração">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Exportar .txt
+                </button>
+                <button class="btn" id="themeBtn" onclick="toggleTheme()" title="Alternar Tema">
+                    <span id="themeIcon"></span>
                 </button>
                 <button class="btn btn-primary" onclick="openModal(false)">
-                    Criar Manual
+                    Indexar Página
                 </button>
             </div>
         </header>
@@ -307,25 +307,23 @@
                 <input type="hidden" id="editId">
                 
                 <div class="form-group">
-                    <label>Escolha o Ícone</label>
+                    <label>Escolha o Ícone/Emoji</label>
                     <div class="emoji-trigger" id="emojiBtn" onclick="toggleEmojiPicker(event)">🚀</div>
                     <input type="hidden" id="pageEmoji" value="🚀">
-                    
-                    <div class="emoji-picker-box" id="emojiPicker">
-                        </div>
+                    <div class="emoji-picker-box" id="emojiPicker"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="pageName">Nome da Página</label>
+                    <label for="pageName">Nome de Exibição</label>
                     <input type="text" id="pageName" required placeholder="Ex: Meu Portfólio">
                 </div>
                 <div class="form-group">
-                    <label for="pageUrl">Caminho / Link arquivo</label>
+                    <label for="pageUrl">Nome do Arquivo .html</label>
                     <input type="text" id="pageUrl" required placeholder="Ex: projeto.html">
                 </div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn" style="background: transparent;" onclick="closeModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </form>
@@ -333,12 +331,16 @@
     </div>
 
     <script>
-        // Banco de emojis para o seletor rápido
         const emojiList = ['🚀','🏠','🧑‍💻','📁','🎨','⚙️','📊','🌐','📝','🛠️','🔥','✨','📦','📱','💻','🔑','💡','🔔','🛒','🎮','🎬'];
         
-        let links = JSON.parse(localStorage.getItem('auto_indexed_links')) || [
-            { id: 1, name: 'Exemplo Indexado', url: 'index.html', emoji: '✨' }
-        ];
+        // Objeto global que guarda todo o estado da aplicação
+        let appState = JSON.parse(localStorage.getItem('portable_dashboard_data')) || {
+            theme: 'dark',
+            links: [
+                { id: 1, name: 'Página Inicial', url: 'index.html', emoji: '🏠' },
+                { id: 2, name: 'Sobre Mim', url: 'sobre.html', emoji: '🧑‍💻' }
+            ]
+        };
 
         const grid = document.getElementById('linksGrid');
         const modalOverlay = document.getElementById('modalOverlay');
@@ -346,113 +348,145 @@
         const pageEmojiInput = document.getElementById('pageEmoji');
         const emojiBtn = document.getElementById('emojiBtn');
 
-        // Inicializa o seletor de emojis
+        // --- EXPORTAR CONFIGURAÇÃO (Gera arquivo .txt) ---
+        function exportConfig() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "dashboard-config.txt");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // --- IMPORTAR CONFIGURAÇÃO (Lê arquivo .txt) ---
+        function importConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validação simples para ver se o arquivo é compatível
+                    if (importedData.links && Array.isArray(importedData.links)) {
+                        appState = importedData;
+                        saveToCache();
+                        applyTheme();
+                        renderLinks();
+                        alert('Configurações importadas com sucesso!');
+                    } else {
+                        alert('Arquivo inválido ou corrompido.');
+                    }
+                } catch (err) {
+                    alert('Erro ao ler o arquivo de texto.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reseta o input de arquivo
+        }
+
+        // --- DARK / LIGHT MODE ---
+        function applyTheme() {
+            if (appState.theme === 'light') {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+            updateThemeIcon(appState.theme);
+        }
+
+        function toggleTheme() {
+            appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+            saveToCache();
+        }
+
+        function updateThemeIcon(theme) {
+            const iconContainer = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                iconContainer.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+            } else {
+                iconContainer.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+            }
+        }
+
+        // --- SELETOR DE EMOJI ---
         function initEmojiPicker() {
             emojiPicker.innerHTML = '';
             emojiList.forEach(emoji => {
                 const span = document.createElement('span');
                 span.className = 'emoji-option';
                 span.innerText = emoji;
-                span.onclick = (e) => {
-                    e.stopPropagation();
-                    selectEmoji(emoji);
-                };
+                span.onclick = (e) => { e.stopPropagation(); selectEmoji(emoji); };
                 emojiPicker.appendChild(span);
             });
         }
-
-        function toggleEmojiPicker(e) {
-            e.stopPropagation();
-            emojiPicker.classList.toggle('open');
-        }
-
-        function selectEmoji(emoji) {
-            pageEmojiInput.value = emoji;
-            emojiBtn.innerText = emoji;
-            emojiPicker.classList.remove('open');
-        }
-
-        // Fecha o seletor ao clicar fora
+        function toggleEmojiPicker(e) { e.stopPropagation(); emojiPicker.classList.toggle('open'); }
+        function selectEmoji(emoji) { pageEmojiInput.value = emoji; emojiBtn.innerText = emoji; emojiPicker.classList.remove('open'); }
         document.addEventListener('click', () => emojiPicker.classList.remove('open'));
 
-        // Renderiza os Cards na Tela
+        // --- RENDERIZAR LINKS ---
         function renderLinks() {
             grid.innerHTML = '';
-            links.forEach(link => {
+            appState.links.forEach(link => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.onclick = (e) => {
-                    if(!e.target.closest('.btn-edit')) window.location.href = link.url;
+                    if(!e.target.closest('.action-btn')) window.location.href = link.url;
                 };
 
                 card.innerHTML = `
-                    <button class="btn-edit">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
+                    <div class="card-actions">
+                        <button class="action-btn edit" title="Editar">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="action-btn delete" title="Remover">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
                     <div class="card-emoji">${link.emoji}</div>
                     <div class="card-title" title="${link.name}">${link.name}</div>
                     <div class="card-url">${link.url}</div>
                 `;
 
-                card.querySelector('.btn-edit').onclick = () => openModal(true, link.id);
+                card.querySelector('.edit').onclick = () => openModal(true, link.id);
+                card.querySelector('.delete').onclick = (e) => deleteLink(link.id, e);
                 grid.appendChild(card);
             });
         }
 
-        // Escaneamento Automático de Pasta
-        document.getElementById('folderScanner').addEventListener('change', function(e) {
-            const files = e.target.files;
-            let novosItens = 0;
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                
-                // Filtra apenas os arquivos na raiz ou subpastas que terminam com .html
-                if (file.name.endsWith('.html')) {
-                    // Evita duplicar arquivos que já estão indexados
-                    const jaExiste = links.some(l => l.url === file.name);
-                    
-                    if (!jaExiste) {
-                        const newId = links.length > 0 ? Math.max(...links.map(l => l.id)) + 1 : 1;
-                        
-                        // Limpa o nome do arquivo para exibição bonita (remove o .html)
-                        let nomeAmigavel = file.name.replace('.html', '');
-                        nomeAmigavel = nomeAmigavel.charAt(0).toUpperCase() + nomeAmigavel.slice(1);
-
-                        links.push({
-                            id: newId,
-                            name: nomeAmigavel,
-                            url: file.name,
-                            emoji: '📄' // Ícone padrão para novos arquivos automáticos
-                        });
-                        novosItens++;
-                    }
-                }
-            }
-
-            if (novosItens > 0) {
-                saveToStorage();
+        function deleteLink(id, event) {
+            event.stopPropagation();
+            if (confirm('Deseja remover esta página indexada?')) {
+                appState.links = appState.links.filter(l => l.id !== id);
+                saveToCache();
                 renderLinks();
             }
-        });
+        }
 
-        // Modal Controls
+        // --- CONTROLES DO MODAL ---
         function openModal(isEdit, id = null) {
             modalOverlay.classList.add('active');
             if (isEdit) {
                 document.getElementById('modalTitle').innerText = 'Editar Página';
-                const link = links.find(l => l.id === id);
+                const link = appState.links.find(l => l.id === id);
                 document.getElementById('editId').value = link.id;
                 document.getElementById('pageName').value = link.name;
                 document.getElementById('pageUrl').value = link.url;
                 selectEmoji(link.emoji);
             } else {
-                document.getElementById('modalTitle').innerText = 'Adicionar Página';
+                document.getElementById('modalTitle').innerText = 'Indexar Nova Página';
                 document.getElementById('linkForm').reset();
                 document.getElementById('editId').value = '';
                 selectEmoji('🚀');
             }
         }
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if(e.target === modalOverlay) closeModal();
+        });
 
         function closeModal() {
             modalOverlay.classList.remove('active');
@@ -467,22 +501,24 @@
             const emoji = pageEmojiInput.value;
 
             if (id) {
-                links = links.map(l => l.id == id ? { id: Number(id), name, url, emoji } : l);
+                appState.links = appState.links.map(l => l.id == id ? { id: Number(id), name, url, emoji } : l);
             } else {
-                const newId = links.length > 0 ? Math.max(...links.map(l => l.id)) + 1 : 1;
-                links.push({ id: newId, name, url, emoji });
+                const newId = appState.links.length > 0 ? Math.max(...appState.links.map(l => l.id)) + 1 : 1;
+                appState.links.push({ id: newId, name, url, emoji });
             }
 
-            saveToStorage();
+            saveToCache();
             renderLinks();
             closeModal();
         }
 
-        function saveToStorage() {
-            localStorage.setItem('auto_indexed_links', JSON.stringify(links));
+        // Armazenamento local rápido apenas para conveniência
+        function saveToCache() {
+            localStorage.setItem('portable_dashboard_data', JSON.stringify(appState));
         }
 
-        // Init
+        // Inicialização
+        applyTheme();
         initEmojiPicker();
         renderLinks();
     </script>
