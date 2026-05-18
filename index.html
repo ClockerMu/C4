@@ -3,427 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C4 Legal Partners | Excelência Paralegal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <title>Dashboard de Projetos Automático</title>
     <style>
         :root {
-            --primary-dark: #0b141e; /* Azul Escuro profundo do portfólio */
-            --accent-gold: #c5a059;  /* Dourado institucional para detalhes */
-            --text-light: #ffffff;
-            --text-muted: #a0aec0;
-            --bg-card: #131f2d;
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+            --card-bg: rgba(22, 30, 49, 0.7);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            scroll-behavior: smooth;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--primary-dark);
-            color: var(--text-light);
-            overflow-x: hidden;
-            line-height: 1.6;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        h1, h2, h3, .brand-title {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 1px;
-        }
-
-        /* Animações de Scroll (Fade-in e Slide) */
-        .fade-in-element {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s ease, transform 1s ease;
-        }
-
-        .fade-in-element.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Header / Navegação */
-        header {
-            position: fixed;
-            top: 0;
+        .container {
             width: 100%;
-            background-color: rgba(11, 20, 30, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
-            z-index: 1000;
-            padding: 1.5rem 10%;
+            max-width: 1040px;
+        }
+
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .logo-container {
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            color: white;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 0.5rem;
+            transition: var(--transition);
         }
 
-        .logo-c4 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--text-light);
-            border-right: 2px solid var(--accent-gold);
-            padding-right: 15px;
+        .btn-primary {
+            background: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
         }
 
-        .logo-text {
-            font-size: 1rem;
-            font-weight: 600;
-            line-height: 1.2;
-            letter-spacing: 2px;
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
         }
 
-        nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            margin-left: 2rem;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* Grid e Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 1.5rem;
         }
 
-        nav a:hover {
-            color: var(--accent-gold);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 10%;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.1);
             position: relative;
-        }
-
-        .hero-subtitle {
-            color: var(--accent-gold);
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 1rem;
-            animation: fadeIn 1.5s ease;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            max-width: 800px;
-        }
-
-        /* Seções Gerais */
-        section {
-            padding: 8rem 10% 6rem 10%;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            color: var(--text-light);
-            margin-bottom: 3rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -10px;
-            width: 60px;
-            height: 2px;
-            background-color: var(--accent-gold);
-        }
-
-        /* Grid de Diferenciais / Sobre */
-        .about-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-text h3 {
-            color: var(--accent-gold);
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
-
-        .about-text p {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            font-size: 1.05rem;
-        }
-
-        .about-image img, .service-image img {
-            width: 100%;
-            border-radius: 4px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(197, 160, 89, 0.1);
-        }
-
-        /* Estrutura de Serviços */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .service-card {
-            background-color: var(--bg-card);
-            padding: 2.5rem;
-            border-radius: 4px;
-            border: 1px solid rgba(197, 160, 89, 0.05);
-            transition: transform 0.4s ease, border 0.4s ease;
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(197, 160, 89, 0.4);
-        }
-
-        .service-card h3 {
-            color: var(--accent-gold);
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-        }
-
-        .service-card ul {
-            list-style: none;
-        }
-
-        .service-card ul li {
-            margin-bottom: 0.8rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .service-card ul li::before {
-            content: '▪';
-            position: absolute;
-            left: 0;
-            color: var(--accent-gold);
-        }
-
-        /* Seção de Destaque para Missão */
-        .mission-box {
-            background-color: var(--bg-card);
-            border: 1px solid var(--accent-gold);
-            padding: 4rem;
-            text-align: center;
-            max-width: 900px;
-            margin: 4rem auto;
-            border-radius: 4px;
-        }
-
-        .mission-box p {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            font-style: italic;
-            color: var(--text-light);
-            line-height: 1.8;
-        }
-
-        /* Contato / CTA */
-        .contact-section {
-            text-align: center;
-            background-color: #060d14;
-            padding: 6rem 10%;
-        }
-
-        .btn-whatsapp {
-            display: inline-block;
-            background-color: transparent;
-            color: var(--accent-gold);
-            border: 2px solid var(--accent-gold);
-            padding: 1rem 3rem;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-decoration: none;
-            margin-top: 2rem;
-            transition: all 0.4s ease;
+            backdrop-filter: blur(16px);
+            transition: var(--transition);
             cursor: pointer;
         }
 
-        .btn-whatsapp:hover {
-            background-color: var(--accent-gold);
-            color: var(--primary-dark);
-            box-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        .qr-code-placeholder {
-            margin-top: 3rem;
+        .card-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .card:hover .card-emoji { transform: scale(1.08); }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-url {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-edit {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            color: white;
+        }
+
+        .card:hover .btn-edit { opacity: 1; }
+        .btn-edit:hover { background: var(--accent); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 10, 19, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: #161e31;
+            border: 1px solid var(--card-border);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 420px;
+            transform: scale(0.95);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .modal { transform: scale(1); }
+
+        .modal h3 { margin-bottom: 1.5rem; font-size: 1.25rem; }
+
+        .form-group {
+            margin-bottom: 1.25rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            gap: 0.5rem;
+            position: relative;
         }
 
-        .qr-code-placeholder img {
-            width: 150px;
-            height: 150px;
-            border: 2px solid var(--accent-gold);
-            padding: 5px;
-            background: white;
+        .form-group label { font-size: 0.85rem; color: var(--text-muted); }
+
+        .form-group input {
+            background: #0b0f19;
+            border: 1px solid var(--card-border);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 0.95rem;
         }
 
-        /* Responsividade Básica */
-        @media (max-width: 768px) {
-            header { padding: 1rem 5%; }
-            nav { display: none; } /* Ideal implementar menu mobile clássico */
-            .about-container { grid-template-columns: 1fr; gap: 2rem; }
-            .hero h1 { font-size: 2.2rem; }
-            section { padding: 6rem 5% 4rem 5%; }
-            .mission-box { padding: 2rem; }
-            .mission-box p { font-size: 1.2rem; }
+        .form-group input:focus { outline: none; border-color: var(--accent); }
+
+        /* Seletor de Emoji Customizado e Fluido */
+        .emoji-trigger {
+            background: #0b0f19;
+            border: 1px solid var(--card-border);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+        }
+        .emoji-trigger:hover { border-color: rgba(255,255,255,0.2); }
+
+        .emoji-picker-box {
+            position: absolute;
+            top: 75px;
+            left: 0;
+            background: #1f2a45;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-md);
+            padding: 0.7rem;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.4rem;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            max-height: 180px;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(-5px);
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .emoji-picker-box.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .emoji-option {
+            font-size: 1.3rem;
+            padding: 0.3rem;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .emoji-option:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 2rem;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-container">
-            <div class="logo-c4">C4</div> <div class="logo-text">LEGAL<br>PARTNERS</div> </div>
-        <nav>
-            <a href="#diferencial">Diferencial</a>
-            <a href="#servicos">Serviços</a>
-            <a href="#missao">Missão</a>
-            <a href="#contato">Contato</a>
-        </nav>
-    </header>
-
-    <main class="hero">
-        <p class="hero-subtitle">Excelência na prestação de serviços</p> <h1>Portfólio de Serviços</h1> </main>
-
-    <section id="diferencial" class="fade-in-element">
-        <h2 class="section-title">Nosso Diferencial</h2> <div class="about-container">
-            <div class="about-text">
-                <h3>Excelência técnica e atendimento consultivo</h3> <p>Estes são os pilares fundamentais que regem a C4 Legal Partners. Buscamos compreender e atender minuciosamente as necessidades de cada cliente, garantindo acompanhamento estritamente personalizado.</p> <p>Oferecemos disponibilidade em tempo integral para alcançar com máxima precisão os interesses estratégicos de nossos parceiros empresariais.</p> </div>
-            <div class="about-image">
-                <img src="escritorio.jpg" alt="C4 Legal Partners Office">
+    <div class="container">
+        <header>
+            <h1>Meus Projetos</h1>
+            <div class="header-actions">
+                <input type="file" id="folderScanner" webkitdirectory directory multiple style="display: none;">
+                <button class="btn btn-secondary" onclick="document.getElementById('folderScanner').click()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    Escanear Pasta
+                </button>
+                <button class="btn btn-primary" onclick="openModal(false)">
+                    Criar Manual
+                </button>
             </div>
+        </header>
+
+        <div class="grid" id="linksGrid"></div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3 id="modalTitle">Editar Página</h3>
+            <form id="linkForm" onsubmit="saveLink(event)">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label>Escolha o Ícone</label>
+                    <div class="emoji-trigger" id="emojiBtn" onclick="toggleEmojiPicker(event)">🚀</div>
+                    <input type="hidden" id="pageEmoji" value="🚀">
+                    
+                    <div class="emoji-picker-box" id="emojiPicker">
+                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageName">Nome da Página</label>
+                    <input type="text" id="pageName" required placeholder="Ex: Meu Portfólio">
+                </div>
+                <div class="form-group">
+                    <label for="pageUrl">Caminho / Link arquivo</label>
+                    <input type="text" id="pageUrl" required placeholder="Ex: projeto.html">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
         </div>
-    </section>
-
-    <section id="servicos" style="background-color: #091018;">
-        <h2 class="section-title fade-in-element">Serviços Especializados</h2>
-        
-        <div class="services-grid">
-            
-            <div class="service-card fade-in-element">
-                <h3>Registro Mercantil</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Atos Societários</p> <ul>
-                    <li>Registro de atos societários em todas as Juntas Comerciais do país</li>
-                    <li>Constituição e alterações contratuais</li>
-                    <li>Reuniões ou assembleias gerais</li>
-                    <li>Distrato social</li>
-                    <li>Atos de transformação, cisão e incorporações</li>
-                    <li>Abertura, alteração e encerramento de filiais</li>
-                    <li>Arquivamento especializado de procurações, jornais e documentos de interesse</li>
-                </ul>
-            </div>
-
-            <div class="service-card fade-in-element">
-                <h3>Registro Mercantil</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Recursos & Certidões</p> <ul>
-                    <li>Pedidos revisionais e Recursos administrativos</li>
-                    <li>Emissão estratégica de certidões simplificadas, específicas e de inteiro teor</li>
-                    <li>Intermediação e atendimento direto com vogais e assessores de registro da Junta Comercial</li>
-                    <li>Comunicação de processos judiciais e arquivamento de certidão premonitória</li>
-                    <li>Regularização estrutural de ficha cadastral e saneamento de boletim administrativo-BA</li>
-                </ul>
-            </div>
-
-            <div class="service-card fade-in-element">
-                <h3>Registros Complementares</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Suporte Contínuo</p> <ul>
-                    <li>Obtenção de CNPJ corporativo pelo Módulo de Administração Tributária (MAT)</li>
-                    <li>Indicação formal de Beneficiário Final (UBO) no sistema e-BEF</li>
-                    <li>Regularização de Inscrição Municipal e Inscrição Estadual</li>
-                    <li>Inscrição dedicada no FGTS para fins específicos de emissão do CRF</li>
-                </ul>
-            </div>
-
-            <div class="service-card fade-in-element">
-                <h3>Cartório de Registro de PJ</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Sociedade Simples</p> <ul>
-                    <li>Atuação altamente técnica no registro completo de sociedades simples (Profissionais)</li>
-                    <li>Constituição, Alterações Contratuais e Distrato Social</li>
-                    <li>Atas de Reuniões e Assembleias Gerais</li>
-                    <li>Processos de Transformação de Natureza Jurídica</li>
-                    <li>Emissão célere de Certidões institucionais</li>
-                </ul>
-            </div>
-
-            <div class="service-card fade-in-element" style="grid-column: span 1;">
-                <h3>Facilities Jurídico</h3> <p style="color: var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase;">Documentação & Certificados</p> <ul>
-                    <li>Regularização, traduções juramentadas e registro integral em Cartório de Registros de Títulos e Documentos (RTD)</li>
-                    <li>Emissão e renovação guiada de certificado digital corporativo</li>
-                    <li>Gestão inteligente de assinaturas eletrônicas via portal Certisign, assegurando plena validade jurídica</li>
-                </ul>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="missao" class="fade-in-element">
-        <div class="mission-box">
-            <p>"Nossa missão é garantir a segurança jurídica e a eficiência operacional por meio de uma assessoria paralegal de alta performance."</p> </div>
-    </section>
-
-    <section id="contato" class="contact-section fade-in-element">
-        <h2 class="brand-title" style="font-size: 2.5rem; margin-bottom: 1rem;">Vamos conversar?</h2> <p style="color: var(--text-muted);">Entre em contato direto com os nossos especialistas parceiros.</p>
-        
-        <a href="https://wa.me/qr/CLIUBF6MH5F4C1" target="_blank" class="btn-whatsapp">Iniciar Atendimento</a>
-
-        <div class="qr-code-placeholder">
-            <img src="qrcode.png" alt="WhatsApp QR Code">
-            <span style="font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;">Aponte a câmera para o QR Code</span>
-        </div>
-    </section>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const elementsToAnimate = document.querySelectorAll('.fade-in-element');
+        // Banco de emojis para o seletor rápido
+        const emojiList = ['🚀','🏠','🧑‍💻','📁','🎨','⚙️','📊','🌐','📝','🛠️','🔥','✨','📦','📱','💻','🔑','💡','🔔','🛒','🎮','🎬'];
+        
+        let links = JSON.parse(localStorage.getItem('auto_indexed_links')) || [
+            { id: 1, name: 'Exemplo Indexado', url: 'index.html', emoji: '✨' }
+        ];
 
-            const observerOptions = {
-                root: null, // viewport do navegador
-                threshold: 0.15, // ativa quando 15% do componente está visível
-                rootMargin: "0px 0px -50px 0px"
-            };
+        const grid = document.getElementById('linksGrid');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const pageEmojiInput = document.getElementById('pageEmoji');
+        const emojiBtn = document.getElementById('emojiBtn');
 
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        // Opcional: deixar de observar após animar uma vez
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            elementsToAnimate.forEach(element => {
-                observer.observe(element);
+        // Inicializa o seletor de emojis
+        function initEmojiPicker() {
+            emojiPicker.innerHTML = '';
+            emojiList.forEach(emoji => {
+                const span = document.createElement('span');
+                span.className = 'emoji-option';
+                span.innerText = emoji;
+                span.onclick = (e) => {
+                    e.stopPropagation();
+                    selectEmoji(emoji);
+                };
+                emojiPicker.appendChild(span);
             });
+        }
+
+        function toggleEmojiPicker(e) {
+            e.stopPropagation();
+            emojiPicker.classList.toggle('open');
+        }
+
+        function selectEmoji(emoji) {
+            pageEmojiInput.value = emoji;
+            emojiBtn.innerText = emoji;
+            emojiPicker.classList.remove('open');
+        }
+
+        // Fecha o seletor ao clicar fora
+        document.addEventListener('click', () => emojiPicker.classList.remove('open'));
+
+        // Renderiza os Cards na Tela
+        function renderLinks() {
+            grid.innerHTML = '';
+            links.forEach(link => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = (e) => {
+                    if(!e.target.closest('.btn-edit')) window.location.href = link.url;
+                };
+
+                card.innerHTML = `
+                    <button class="btn-edit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <div class="card-emoji">${link.emoji}</div>
+                    <div class="card-title" title="${link.name}">${link.name}</div>
+                    <div class="card-url">${link.url}</div>
+                `;
+
+                card.querySelector('.btn-edit').onclick = () => openModal(true, link.id);
+                grid.appendChild(card);
+            });
+        }
+
+        // Escaneamento Automático de Pasta
+        document.getElementById('folderScanner').addEventListener('change', function(e) {
+            const files = e.target.files;
+            let novosItens = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Filtra apenas os arquivos na raiz ou subpastas que terminam com .html
+                if (file.name.endsWith('.html')) {
+                    // Evita duplicar arquivos que já estão indexados
+                    const jaExiste = links.some(l => l.url === file.name);
+                    
+                    if (!jaExiste) {
+                        const newId = links.length > 0 ? Math.max(...links.map(l => l.id)) + 1 : 1;
+                        
+                        // Limpa o nome do arquivo para exibição bonita (remove o .html)
+                        let nomeAmigavel = file.name.replace('.html', '');
+                        nomeAmigavel = nomeAmigavel.charAt(0).toUpperCase() + nomeAmigavel.slice(1);
+
+                        links.push({
+                            id: newId,
+                            name: nomeAmigavel,
+                            url: file.name,
+                            emoji: '📄' // Ícone padrão para novos arquivos automáticos
+                        });
+                        novosItens++;
+                    }
+                }
+            }
+
+            if (novosItens > 0) {
+                saveToStorage();
+                renderLinks();
+            }
         });
+
+        // Modal Controls
+        function openModal(isEdit, id = null) {
+            modalOverlay.classList.add('active');
+            if (isEdit) {
+                document.getElementById('modalTitle').innerText = 'Editar Página';
+                const link = links.find(l => l.id === id);
+                document.getElementById('editId').value = link.id;
+                document.getElementById('pageName').value = link.name;
+                document.getElementById('pageUrl').value = link.url;
+                selectEmoji(link.emoji);
+            } else {
+                document.getElementById('modalTitle').innerText = 'Adicionar Página';
+                document.getElementById('linkForm').reset();
+                document.getElementById('editId').value = '';
+                selectEmoji('🚀');
+            }
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            emojiPicker.classList.remove('open');
+        }
+
+        function saveLink(event) {
+            event.preventDefault();
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('pageName').value;
+            const url = document.getElementById('pageUrl').value;
+            const emoji = pageEmojiInput.value;
+
+            if (id) {
+                links = links.map(l => l.id == id ? { id: Number(id), name, url, emoji } : l);
+            } else {
+                const newId = links.length > 0 ? Math.max(...links.map(l => l.id)) + 1 : 1;
+                links.push({ id: newId, name, url, emoji });
+            }
+
+            saveToStorage();
+            renderLinks();
+            closeModal();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('auto_indexed_links', JSON.stringify(links));
+        }
+
+        // Init
+        initEmojiPicker();
+        renderLinks();
     </script>
 </body>
 </html>
