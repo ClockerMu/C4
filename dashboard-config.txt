@@ -1,0 +1,23 @@
+{
+  "theme": "dark",
+  "links": [
+    {
+      "id": 1,
+      "name": "Sorteador",
+      "url": "sorteador.html",
+      "emoji": "✨"
+    },
+    {
+      "id": 2,
+      "name": "Post-it",
+      "url": "PostIT.html",
+      "emoji": "📝"
+    },
+    {
+      "id": 3,
+      "name": "ToDo",
+      "url": "ToDo.html",
+      "emoji": "🔔"
+    }
+  ]
+}
